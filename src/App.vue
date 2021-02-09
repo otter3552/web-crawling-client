@@ -42,10 +42,14 @@ export default {
     //
   }),
   mounted(){
-    axios.post('/')
-      .then((response) => {
+    
+   axios.post('/',{
+      params: {
+        foo: 'bar'
+      }
+     }).then((response) => {
         console.log('response = ',response)
-      }).catch((e) =>{
+      }).catch( (e) =>{
         console.log('error = ',e)
       })
   }
