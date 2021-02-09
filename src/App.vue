@@ -29,17 +29,25 @@
 </template>
 
 <script>
+/* eslint-disable */
 import HelloWorld from './components/HelloWorld';
+import axios from 'axios'
 
 export default {
   name: 'App',
-
   components: {
     HelloWorld,
   },
-
   data: () => ({
     //
   }),
+  mounted(){
+    axios.post('/')
+      .then((response) => {
+        console.log('response = ',response)
+      }).catch((e) =>{
+        console.log('error = ',e)
+      })
+  }
 };
 </script>
