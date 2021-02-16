@@ -4,7 +4,7 @@
       메모리 관리 > memoryMenu 1
     </v-subheader>
     
-    <line-chart width="400" height="100" :chart-data="datacollection"></line-chart>
+    <line-chart :width="400" :height="100" :chart-data="datacollection"></line-chart>
     <button @click="fillData()">Randomize</button>
     {{datacollection}}
   </v-container>

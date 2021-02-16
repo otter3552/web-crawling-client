@@ -25,14 +25,14 @@
       app
       style="background-color : #293042; color : white;"
     >
-      <v-img
+      <!-- <v-img
         alt="CI"
         class="shrink mt-4 mb-4"
         contain
-        src="./assets/cpstCI.png"
+        src="./assets/CI.png"
         transition="scale-transition"
         width="200"
-      />
+      /> -->
       <v-treeview
         v-model="tree"
         :items="items"

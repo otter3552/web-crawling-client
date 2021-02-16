@@ -4,7 +4,7 @@
       프로세스 관리 > 진행도 관리
     </v-subheader>
     <v-card elevation="0" style="border : 1px solid gray">
-      <v-list>
+      <v-list >
         <v-list-group
           v-for="(item,index) in items"
           :key="item.title"
@@ -15,7 +15,7 @@
         >
           <template v-slot:activator>
             <v-list-item-content>
-              <v-row>
+              <v-row @click="renderProcessChart(index)">
                 <v-col cols="2">
                     <v-list-item-title v-text="item.title"></v-list-item-title>
                 </v-col>
@@ -33,59 +33,157 @@
               </v-row>
             </v-list-item-content>
           </template>
-          <v-list-item
-            v-for="child in item.items"
-            :key="child.title"
-          >
-            <v-list-item-content>
-              <v-list-item-title v-text="child.title"></v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>  
+          <!-- 리스트 클릭하면 열리는 토글 영역 start-->
+          <v-row>
+            <v-col cols="2"/>
+            <v-col cols="7">
+              <span v-for="(datset,index) in item.chartData.datasets"
+                    :key="index"
+                    style="color : black; margin-left : 5px;">{{datset.label}}, &nbsp;</span>
+            </v-col>
+            <v-col cols="3">
+              <v-btn color="#1976d2" small @click="onClickPorpertyAddbtn(index)" style="padding-right : 3px; margin-right : 5px;">property 추가</v-btn>
+              <v-btn color="error" small @click="onClickPorpertyRemovebtn(index)" style="padding-right : 3px; margin-right : 5px;">property 삭제</v-btn>
+            </v-col>
+          </v-row>
+          <br>
+          <!-- 리스트 클릭하면 열리는 토글 영역 end-->
         </v-list-group>        
       </v-list>
     </v-card>
+
+
+    <v-dialog
+      v-model="propertyDialog"
+      width="500"
+    >
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          property Add
+        </v-card-title>
+          <div style="width: 100%; height : 80px; text-align :center;" >
+            <v-text-field v-model="propertyName" outlined dense style="margin-top: 40px; margin-left : 40px; width: 50%;"></v-text-field>
+          </div>
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+         
+          <v-btn
+            color="primary"
+            text
+            @click="addProPerty"
+          >
+            I accept
+          </v-btn>
+          <v-btn
+            color="gray"
+            text
+            @click="closePopup"
+          >
+            취소
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog
+      v-model="propertyRemoveDialog"
+      width="500"
+    >
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          property remove
+        </v-card-title>
+          <div style="width: 100%; height : 80px; text-align :center;" >
+            <v-select v-if="selectedListIndex > -1 && items[selectedListIndex].chartData !== undefined "
+                      v-model="removeProPertyItem"
+                      :items="items[selectedListIndex].chartData.datasets" 
+                      item-value="label"
+                      item-text="label"
+                      outlined
+                      dense 
+                      style="margin-top: 40px; margin-left : 40px; width: 50%; color : gray !important;"></v-select>
+          </div>
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+         
+          <v-btn
+            color="error"
+            text
+            @click="removeProPerty"
+          >
+            삭제
+          </v-btn>
+          <v-btn
+            color="primary"
+            text
+            @click="closeRemovePopup"
+          >
+            취소
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <line-chart v-if="getSelectedChartData != null" :width="400" :height="400" :chart-data="getSelectedChartData" ></line-chart> 
+
+    
   </v-container>
 </template>
 
 <script>
 /* eslint-disable */
+import ChartData from '../models/ChartData.js'
+import Reactive from './charts/Reactive.vue'
 export default {  
+  components: {
+    Reactive
+  },
   data: () => ({
     value: 10,
+    render: true,
+    propertyDialog : false,
+    propertyRemoveDialog : false,
+    propertyName: '',
+    selectedListIndex: -1,
+    removeProPertyItem : '',
+    datacollection: {},
     items: [
         {
           title: 'process1',
-          items: [{ title: 'process1-1' }],
           value:0,
-          active: false
+          active: false,
+          chartData: new ChartData([],[{label : 'property1', data: []}]) 
         },
         {
           title: 'process2',
-          items: [
-            { title: 'process2-1' },
-            { title: 'process2-2' },
-            { title: 'process2-3' },
-          ],
           value:0,
-          active: false
+          active: false,
+          chartData: new ChartData([],[{label : 'property1', data: []}]) 
         },
         {
           title: 'process3',
           items: [{ title: 'process3-1' }],
           value:0,
-          active: false
+          active: false,
+          chartData: new ChartData([],[{label : 'property1', data: []}]) 
         },
         {
           title: 'process4',
           items: [{ title: 'process4-1' }],
           value:0,
-          active: false
+          active: false,
+          chartData: new ChartData([],[{label : 'property1', data: []}]) 
         },
         {
           title: 'process5',
           items: [{ title: 'process5-1' }],
           value:0,
-          active: false
+          active: false,
+          chartData: new ChartData([],[{label : 'property1', data: []}]) 
         },
         {
           title: 'process6',
@@ -95,7 +193,8 @@ export default {
             { title: 'process6-3' },
           ],
           value:0,
-          active: false
+          active: false,
+          chartData: new ChartData([],[{label : 'property1', data: []}]) 
         },
         {
           title: 'process7',
@@ -105,14 +204,118 @@ export default {
             { title: 'process7-3' },
           ],
           value:0,
-          active: false
+          active: false,
+          chartData: new ChartData([],[{label : 'property1', data: []}]) 
         },
       ],
+      selectedChartData: null,
+      realTimeUpdateMethods: null
   }),
-  mounted () {
+  created(){
     this.startBuffer()
   },
+  mounted(){
+    this.items.forEach(item =>{
+      let currentTime = new Date()
+      item.chartData = new ChartData([],[{label : 'property1', data: []}])
+      let count = Math.floor( Math.random() * 3)+1
+      
+      for(let i=0 ; i<count; i++){
+        item.chartData.addDataset({label : 'property'+(item.chartData.datasets.length+1) , data: []})
+      }
+      
+      for(let i = 0; i<12; i++){
+        currentTime.setMinutes(currentTime.getMinutes() -1 )
+        item.chartData.addLabel(currentTime.toLocaleString())
+        item.chartData.datasets.forEach(dataset =>{
+          dataset.data.push(Math.random() * (15 - 5) + 5)
+        })
+      }
+    })
+  },
   methods: {
+    async closeRemovePopup(){
+      this.propertyRemoveDialog = false
+      this.selectedChartData = this.items[this.selectedListIndex].chartData
+    },
+    async removeProPerty(){
+      if(confirm('정말로 삭제하시겠습니까 ?')){
+        console.log('this.removeProPertyItem = ',this.removeProPertyItem)
+        const idx = this.items[this.selectedListIndex].chartData.datasets.findIndex(dataset =>{
+          return dataset.label == this.removeProPertyItem
+        })
+
+        this.items[this.selectedListIndex].chartData.datasets.splice(idx, 1)
+        
+      }
+      this.propertyRemoveDialog = false
+      this.selectedChartData = this.items[this.selectedListIndex].chartData
+    },
+    async renderProcessChart(index){
+      this.selectedChartData = this.items[index].chartData
+
+
+      if(this.realTimeUpdateMethods != null){
+        clearInterval(this.realTimeUpdateMethods)
+      }
+     
+      // dataSetCount
+      this.realTimeUpdateMethods = setInterval(() => {
+        console.log('exe')
+        this.items[index].chartData = new ChartData([],[{label : 'property1', data: []}])
+        let currentTime = new Date()
+
+        for(let i = 0; i<12; i++){
+          currentTime.setMinutes(currentTime.getMinutes() -1 )
+          this.items[index].chartData.addLabel(currentTime.toLocaleString())
+          this.items[index].chartData.datasets.forEach(dataset =>{
+            dataset.data.push(Math.random() * (15 - 5) + 5)
+          })
+        }
+        
+        this.selectedChartData = this.items[index].chartData
+        
+      }, 2000)
+
+     
+    },
+    async closePopup(){
+      this.propertyName = ''
+      this.propertyDialog = false
+      this.selectedChartData = this.items[this.selectedListIndex].chartData
+    },
+    async addProPerty(){
+      let obj = {
+        label : '',
+        data : []
+      }
+      obj.label = this.propertyName
+      for(let i = 0; i<12; i++){
+        obj.data.push(Math.random() * (15 - 5) + 5)
+        
+      }
+      
+      this.items[this.selectedListIndex].chartData.addDataset(obj)
+
+      this.propertyName = ''
+      this.propertyDialog = false
+      
+      
+      this.selectedChartData = this.items[this.selectedListIndex].chartData
+      
+      
+    },
+    async onClickPorpertyRemovebtn(index){
+      this.propertyRemoveDialog = true
+      this.selectedListIndex = index
+      this.selectedChartData = null
+    },
+    async onClickPorpertyAddbtn(index){
+      this.selectedChartData = null
+      this.selectedListIndex = index
+      this.propertyDialog = true
+      
+    },
     async onClickListItem(item){
       item.active = true
     },
@@ -136,11 +339,22 @@ export default {
           this.value = 0
         }
       }, 2000)
-    }
+    },
   },
   watch: {
     
   },
+  computed: {
+    getSelectedChartData(){
+      
+      return this.selectedChartData
+    }
+  }
 
 }
 </script>
+<style>
+i.v-icon.notranslate.mdi.mdi-menu-down.theme--light{
+  color: gray !important;
+}
+</style>
