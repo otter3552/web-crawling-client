@@ -1,6 +1,9 @@
 <template>
   <v-container>
-    1234567
+    <v-subheader>
+      메모리 관리 > memoryMenu 1
+    </v-subheader>
+    차트들...
   </v-container>
 </template>
 
@@ -8,7 +11,13 @@
 /* eslint-disable */
 export default {  
   data: () => ({
-   
+    
   }),
+  mounted () {
+  
+  },
+  methods: {
+
+  },
 }
 </script>
