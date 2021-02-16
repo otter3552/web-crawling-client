@@ -57,7 +57,6 @@
       </v-treeview>
     </v-navigation-drawer>
     <v-main>
-      <!-- <processView/> -->
       <keep-alive>
         <component v-if="selectedMenu !=null" v-bind:is="selectedMenu.component"></component>
       </keep-alive>
