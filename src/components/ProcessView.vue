@@ -253,7 +253,7 @@ export default {
     },
     async renderProcessChart(index){
       this.selectedChartData = this.items[index].chartData
-
+      
 
       if(this.realTimeUpdateMethods != null){
         clearInterval(this.realTimeUpdateMethods)
@@ -261,17 +261,36 @@ export default {
      
       // dataSetCount
       this.realTimeUpdateMethods = setInterval(() => {
-        console.log('exe')
-        this.items[index].chartData = new ChartData([],[{label : 'property1', data: []}])
+        
+        let preChartData = this.items[index].chartData.datasets
+
+        this.items[index].chartData = new ChartData([],[])
+        
+        for(let i = 0; i< preChartData.length; i++){
+          let obj = {
+            label : preChartData[i].label,
+            data: []
+          }
+          for(let j = 1; j<12; j++){
+            obj.data.push(preChartData[i].data[j])
+          }
+          obj.data.push(Math.random() * (15 - 5) + 5)
+          this.items[index].chartData.addDataset(obj)
+        }
+        // this.items[index].chartData.addDataset([],[{label : , data: []}])
         let currentTime = new Date()
 
         for(let i = 0; i<12; i++){
           currentTime.setMinutes(currentTime.getMinutes() -1 )
           this.items[index].chartData.addLabel(currentTime.toLocaleString())
-          this.items[index].chartData.datasets.forEach(dataset =>{
-            dataset.data.push(Math.random() * (15 - 5) + 5)
-          })
+          // this.items[index].chartData.datasets.forEach(dataset =>{
+          //   dataset.data.push(Math.random() * (15 - 5) + 5)
+          // })
         }
+
+        this.items[index].chartData.datasets
+
+        console.log('preChartData = ',preChartData)
         
         this.selectedChartData = this.items[index].chartData
         
